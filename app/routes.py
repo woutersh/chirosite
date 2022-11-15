@@ -4,6 +4,7 @@ from app.forms import LoginForm,MakeProgram,EditProfileForm
 from flask_login import current_user, login_user,logout_user, login_required
 from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
+from datetime import datetime
 
 
 
@@ -46,15 +47,20 @@ def leider(email):
 @app.route('/groep/<email>')
 @login_required
 def groep(email):
+    now = datetime.now().strftime("%d/%m")
     leider = Leider.query.filter_by(email=email).first_or_404()
     groep = Groep.query.filter_by(id=leider.groep_id).first_or_404()
+    programmas = Programma.query.filter_by(groep_id=Groep.id).order_by(Programma.datum).all()
+    for p in programmas:
+        if p.datum<now:
+            programmas.remove(p)
     form = MakeProgram()
     if form.validate_on_submit():
         program = Programma(activiteit=form.activity.data, datum=form.datum.data,groep=groep)
         db.session.add(program)
         db.session.commit()
-        return render_template('groep.html',groep=groep,form =form,leider=leider)
-    return render_template('groep.html',groep=groep,form =form,leider=leider)
+        return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
+    return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

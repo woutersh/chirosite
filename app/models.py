@@ -67,12 +67,12 @@ class Groep(UserMixin, db.Model):
 class Programma(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     activiteit = db.Column(db.String(500), index=True)
-    datum = db.Column(db.String(45), index=True, unique=True)
+    datum = db.Column(db.String(45), index=True)
     time_posted = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     groep_id = db.Column(db.Integer, db.ForeignKey('groep.id'))
 
     def __repr__(self):
-        return '<Programma van {}>'.format(self.datum)
+        return 'Programma van {}'.format(self.datum)
 
 
 @login.user_loader
