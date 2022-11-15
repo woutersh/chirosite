@@ -1,9 +1,10 @@
 from flask import render_template, flash, redirect, url_for,request
-from app import app
-from app.forms import LoginForm
+from app import app,db
+from app.forms import LoginForm,MakeProgram,EditProfileForm
 from flask_login import current_user, login_user,logout_user, login_required
-from app.models import Leider
+from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
+
 
 
 @app.route('/')
@@ -40,5 +41,58 @@ def logout():
 @login_required
 def leider(email):
     leider = Leider.query.filter_by(email=email).first_or_404()
-
     return render_template('leider.html', leider=leider)
+
+@app.route('/groep/<email>')
+@login_required
+def groep(email):
+    leider = Leider.query.filter_by(email=email).first_or_404()
+    groep = Groep.query.filter_by(id=leider.groep_id).first_or_404()
+    form = MakeProgram()
+    if form.validate_on_submit():
+        program = Programma(activiteit=form.activity.data, datum=form.datum.data,groep=groep)
+        db.session.add(program)
+        db.session.commit()
+        return render_template('groep.html',groep=groep,form =form,leider=leider)
+    return render_template('groep.html',groep=groep,form =form,leider=leider)
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        current_user.afwezigheid = form.afwezigheid.data
+        current_user.alias = form.alias.data
+        current_user.address = form.address.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return render_template('leider.html', leider=current_user)
+    elif request.method == 'GET':
+        form.email.data = current_user.email
+        form.afwezigheid.data = current_user.afwezigheid
+        form.address.data = current_user.address
+        form.alias.data = current_user.alias
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)
+
+@app.route('/edit_programma', methods=['GET', 'POST'])
+@login_required
+def edit_programma():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        current_user.afwezigheid = form.afwezigheid.data
+        current_user.alias = form.alias.data
+        current_user.address = form.address.data
+        current_user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return render_template('leider.html', leider=current_user)
+    elif request.method == 'GET':
+        form.email.data = current_user.email
+        form.afwezigheid.data = current_user.afwezigheid
+        form.address.data = current_user.address
+        form.alias.data = current_user.alias
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Groep: {{groep}}</h1>
+    <div><td>Strepen: {{groep.strepen}}</td></div>
+
+    {% if current_user.goep_id == groep.id %}
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.datum.label }}<br>
+                {{ form.datum(size=32) }}<br>
+                {% for error in form.datum.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.activity.label }}<br>
+                {{ form.activity(cols=32, rows=4) }}<br>
+                {% for error in form.activity.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    {% endif %}
+
+{% endblock %}

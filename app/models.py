@@ -32,6 +32,27 @@ class Leider(UserMixin,db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def get_leider(id):
+        leider = Leider.query.get(id)
+        if leider:
+            return leider
+        else:
+            raise ValueError('geen leider gevonden met dit id')
+
+    def give_stripe(self,quantity=1):
+        self.strepen =str(int(self.strepen)+quantity)
+        db.session.commit()
+
+    def reduce_stripe(self,quantity):
+        if int(self.strepen)>=quantity:
+            self.strepen = str(int(self.strepen) - int(quantity))
+            db.session.commit()
+        else:raise ValueError('kan geen {} strepen aftrekken, hij heeft er te wijnig'.format(quantity))
+
+
+
+
+
 class Groep(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(45), index=True, unique=True)
@@ -41,6 +62,7 @@ class Groep(UserMixin, db.Model):
 
     def __repr__(self):
         return '{}'.format(self.name)
+
 
 class Programma(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

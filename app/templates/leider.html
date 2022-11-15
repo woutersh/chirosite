@@ -2,9 +2,13 @@
 
 {% block content %}
     <h1>Leider: {{leider}}</h1>
-    <td>Groep: {{leider.groep}}</td>
-    <td>Strepen: {{leider.strepen}}</td>
-    <td>Rekening: {{leider.rekening}} euro</td>
-
+    <div></div><td>Groep: {{leider.groep}}</td></div>
+    <div><td>Strepen: {{leider.strepen}}</td></div>
+    <div><td>Rekening: {{leider.rekening}} euro</td></div>
+    <div><td>aanwezigheid: {{leider.afwezigheid}}</td></div>
+    <div><td>aanwezigheid: {{leider.afwezigheid}}</td></div>
+    {% if leider == current_user %}
+                <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
+    {% endif %}
 
 {% endblock %}
