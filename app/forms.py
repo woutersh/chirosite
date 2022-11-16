@@ -20,8 +20,8 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class MakeProgram(FlaskForm):
-    datum = StringField('Datum',validators=[DataRequired()])
-    activity = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
+    datum = StringField('Datum (dd/mm/jj)',validators=[DataRequired()])
+    activiteit = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
 
     def validate_date(self, date):

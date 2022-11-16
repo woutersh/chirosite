@@ -44,21 +44,23 @@ def leider(email):
     leider = Leider.query.filter_by(email=email).first_or_404()
     return render_template('leider.html', leider=leider)
 
-@app.route('/groep/<email>')
+@app.route('/groep/<email>', methods=['GET', 'POST'] )
 @login_required
 def groep(email):
     now = datetime.now().strftime("%d/%m")
     leider = Leider.query.filter_by(email=email).first_or_404()
     groep = Groep.query.filter_by(id=leider.groep_id).first_or_404()
-    programmas = Programma.query.filter_by(groep_id=Groep.id).order_by(Programma.datum).all()
+    programmas = Programma.query.filter_by(groep_id=Groep.id).order_by(datetime.strptime(Programma.datum,'d%/m%/y%')).all()
     for p in programmas:
-        if p.datum<now:
+        if datetime.strptime(p.datum,'d%/m%/y%')<now:
             programmas.remove(p)
     form = MakeProgram()
     if form.validate_on_submit():
-        program = Programma(activiteit=form.activity.data, datum=form.datum.data,groep=groep)
+        program = Programma(activiteit=form.activiteit.data, datum=form.datum.data,groep=groep)
         db.session.add(program)
         db.session.commit()
+        if datetime.strptime(program.datum,'d%/m%/y%')>=now:
+            programmas.add(program)
         return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
     return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
 
