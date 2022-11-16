@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField,TextAreaField, Subm
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import Programma
 
+
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -14,17 +15,17 @@ class EditProfileForm(FlaskForm):
     afwezigheid = TextAreaField('Afwezigheid', validators=[Length(min=0, max=100)])
     address = StringField('Adres', validators=[DataRequired()])
     alias = StringField('Bijnaam', validators=[DataRequired()])
-    password = PasswordField('nieuw wachtwoord', validators=[DataRequired()])
+    password = PasswordField('nieuw wachtwoord')
     password2 = PasswordField(
-        'herhaal nieuw wachtwoord', validators=[DataRequired(), EqualTo('password')])
+        'herhaal nieuw wachtwoord', validators=[EqualTo('password')])
     submit = SubmitField('Submit')
 
 class MakeProgram(FlaskForm):
-    datum = StringField('Datum (dd/mm/jj)',validators=[DataRequired()])
+    datum = TextAreaField('Datum (dd/mm/jj)',validators=[DataRequired()])
     activiteit = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
 
     def validate_date(self, date):
         p = Programma.query.filter_by(datum=date.data).first()
         if p is not None:
-            raise ValidationError('Deze dag heeft al een prgramma')
+            raise ValidationError('Deze dag heeft al een programma')

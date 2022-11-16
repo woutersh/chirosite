@@ -50,17 +50,20 @@ def groep(email):
     now = datetime.now().strftime("%d/%m")
     leider = Leider.query.filter_by(email=email).first_or_404()
     groep = Groep.query.filter_by(id=leider.groep_id).first_or_404()
-    programmas = Programma.query.filter_by(groep_id=Groep.id).order_by(datetime.strptime(Programma.datum,'d%/m%/y%')).all()
+    programmas = Programma.query.filter_by(groep_id=Groep.id).all()
+    sorted = programmas.sort(key=lambda date: datetime.strptime(date.datum.strip(), "%d/%m/%y"))
     for p in programmas:
-        if datetime.strptime(p.datum,'d%/m%/y%')<now:
+        if datetime.strptime(p.datum.strip(),'%d/%m/%y') < datetime.now():
             programmas.remove(p)
     form = MakeProgram()
     if form.validate_on_submit():
         program = Programma(activiteit=form.activiteit.data, datum=form.datum.data,groep=groep)
         db.session.add(program)
         db.session.commit()
-        if datetime.strptime(program.datum,'d%/m%/y%')>=now:
-            programmas.add(program)
+        if datetime.strptime(program.datum.strip(),'%d/%m/%y') > datetime.now():
+            programmas.append(program)
+            flash('programma is toegevoegd')
+
         return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
     return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
 
