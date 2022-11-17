@@ -13,7 +13,8 @@ from datetime import datetime
 @login_required
 def index():
     leider = {'firstname': 'Hannes'}
-    return render_template('index.html', title='Home', leider=leider)
+    groepen =Groep.query.all()
+    return render_template('index.html', title='Home', leider=leider,groepen=groepen)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -64,7 +65,8 @@ def groep(email):
             programmas.append(program)
             flash('programma is toegevoegd')
 
-        return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
+        return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas\
+                               )
     return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])

@@ -2,5 +2,9 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.firstname }}!</h1>
+    groepen:
+    {% for g in groepen %}
+        <p><a href="{{ url_for('groep', email=current_user.email) }}">{{g.name}}</a></p>
+    {% endfor %}
 
 {% endblock %}

@@ -12,7 +12,7 @@ class LoginForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
-    afwezigheid = TextAreaField('Afwezigheid', validators=[Length(min=0, max=100)])
+    afwezigheid = TextAreaField('Aanwezigheid', validators=[Length(min=0, max=100)])
     address = StringField('Adres', validators=[DataRequired()])
     alias = StringField('Bijnaam', validators=[DataRequired()])
     password = PasswordField('nieuw wachtwoord')
