@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for,request
 from app import app,db
-from app.forms import LoginForm,MakeProgram,EditProfileForm
+from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm
 from flask_login import current_user, login_user,logout_user, login_required
 from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
@@ -38,16 +38,17 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/user/<email>')
+@app.route('/user/<email>/<id>')
 @login_required
-def leider(email):
-    leider = Leider.query.filter_by(email=email).first_or_404()
-    return render_template('leider.html', leider=leider)
+def leider(email,id):
+    leider =Leider.query.filter_by(id=id).first_or_404()
+    bezoeker = Leider.query.filter_by(email=email).first_or_404()
+    return render_template('leider.html', leider=leider,bezoeker=bezoeker)
 
 @app.route('/groep/<email>/<id>', methods=['GET', 'POST'] )
 @login_required
 def groep(email,id):
-    now = datetime.now().strftime("%d/%m")
+    leiders= Leider.query.filter_by(groep_id=id).all()
     leider = Leider.query.filter_by(email=email).first_or_404()
     groep = Groep.query.filter_by(id=id).first_or_404()
     programmas = Programma.query.filter_by(groep_id=groep.id).all()
@@ -65,8 +66,9 @@ def groep(email,id):
             flash('programma is toegevoegd')
 
         return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas\
-                               )
-    return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas)
+                               ,leiders=leiders)
+    return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas\
+                                ,leiders=leiders)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -108,3 +110,17 @@ def edit_programma():
         form.alias.data = current_user.alias
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
+@app.route('/leiding_strepen', methods=['GET', 'POST'] )
+@login_required
+def leiding_strepen():
+    leiders =Leider.query.all()
+    form = StrepenForm()
+
+    return render_template('strepen.html',title='strepen',list=leiders,form=form)
+
+@app.route('/groep_strepen')
+@login_required
+def groep_strepen():
+    form = StrepenForm()
+    groepen =Groep.query.all()
+    return render_template('strepen.html',title='strepen',list=groepen,form=form)

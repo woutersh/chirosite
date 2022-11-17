@@ -40,15 +40,18 @@ class Leider(UserMixin,db.Model):
         else:
             raise ValueError('geen leider gevonden met dit id')
 
-    def give_stripe(self,quantity=1):
-        self.strepen =str(int(self.strepen)+quantity)
+    def give_stripe(self):
+        self.strepen =str(int(self.strepen)+1)
         db.session.commit()
+        return self.strepen
 
-    def reduce_stripe(self,quantity):
-        if int(self.strepen)>=quantity:
-            self.strepen = str(int(self.strepen) - int(quantity))
+    def reduce_stripe(self):
+        if int(self.strepen)>0:
+            self.strepen = str(int(self.strepen) - 1)
             db.session.commit()
-        else:raise ValueError('kan geen {} strepen aftrekken, hij heeft er te wijnig'.format(quantity))
+            return self.strepen
+        else:return self.strepen
+
 
 
 

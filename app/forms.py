@@ -1,3 +1,4 @@
+import wtforms
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField,TextAreaField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
@@ -20,6 +21,9 @@ class EditProfileForm(FlaskForm):
         'herhaal nieuw wachtwoord', validators=[EqualTo('password')])
     submit = SubmitField('Submit')
 
+
+
+
 class MakeProgram(FlaskForm):
     datum = TextAreaField('Datum (dd/mm/jj)',validators=[DataRequired()])
     activiteit = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
@@ -29,3 +33,7 @@ class MakeProgram(FlaskForm):
         p = Programma.query.filter_by(datum=date.data).first()
         if p is not None:
             raise ValidationError('Deze dag heeft al een programma')
+
+class StrepenForm(FlaskForm):
+    plus = SubmitField('+')
+    min = SubmitField('-')
