@@ -16,7 +16,6 @@
             {% else %}
             <a href="{{ url_for('leider', email=current_user.email) }}">Profile</a>
             <a href="{{ url_for('logout') }}">Logout</a>
-            <a href="{{ url_for('groep', email=current_user.email) }}"> {{current_user.groep}}</a>
             {% endif %}
     </div>
         <hr>

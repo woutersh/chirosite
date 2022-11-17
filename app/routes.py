@@ -16,7 +16,6 @@ def index():
     groepen =Groep.query.all()
     return render_template('index.html', title='Home', leider=leider,groepen=groepen)
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -45,13 +44,13 @@ def leider(email):
     leider = Leider.query.filter_by(email=email).first_or_404()
     return render_template('leider.html', leider=leider)
 
-@app.route('/groep/<email>', methods=['GET', 'POST'] )
+@app.route('/groep/<email>/<id>', methods=['GET', 'POST'] )
 @login_required
-def groep(email):
+def groep(email,id):
     now = datetime.now().strftime("%d/%m")
     leider = Leider.query.filter_by(email=email).first_or_404()
-    groep = Groep.query.filter_by(id=leider.groep_id).first_or_404()
-    programmas = Programma.query.filter_by(groep_id=Groep.id).all()
+    groep = Groep.query.filter_by(id=id).first_or_404()
+    programmas = Programma.query.filter_by(groep_id=groep.id).all()
     sorted = programmas.sort(key=lambda date: datetime.strptime(date.datum.strip(), "%d/%m/%y"))
     for p in programmas:
         if datetime.strptime(p.datum.strip(),'%d/%m/%y') < datetime.now():
