@@ -113,16 +113,60 @@ def edit_programma():
 @app.route('/leiding_strepen', methods=['GET', 'POST'] )
 @login_required
 def leiding_strepen():
-    leiders =Leider.query.all()
-    form = StrepenForm()
-    return render_template('strepen.html',title='strepen',list=leiders,form=form)
+    leiders = Leider.query.all()
+    forms = []
+    for leider in leiders:
+        form = StrepenForm(prefix=leider.alias)
+        form.naam = leider.alias
+        form.strepen = leider.strepen
+        forms.append(form)
+    for form in forms:
+        if form.submit.data and form.validate_on_submit():
+            if form.geklusd.data == True:
+                l = Leider.query.filter_by(alias=form.naam).first()
+                if int(l.strepen) > 2:
+                    l.strepen = str(int(l.strepen) - 3)
+                else:
+                    l.strepen = '0'
+                form.strepen = l.strepen
+                form.geklusd.data = False
+                db.session.commit()
+
+
+            else:
+                l = Leider.query.filter_by(alias=form.naam).first()
+                l.strepen = str(int(l.strepen) + 1)
+                form.strepen = l.strepen
+                db.session.commit()
+    return render_template('strepen.html', title='leider strepen', forms=forms)
 
 @app.route('/groep_strepen',methods=['GET', 'POST'])
 @login_required
 def groep_strepen():
-    form = StrepenForm()
     groepen =Groep.query.all()
-    return render_template('strepen.html',title='strepen',list=groepen,form=form)
+    forms=[]
+    for groep in groepen:
+        form = StrepenForm(prefix=groep.name)
+        form.naam = groep.name
+        form.strepen = groep.strepen
+        forms.append(form)
+    for form in forms:
+        if form.submit.data and form.validate_on_submit():
+            if form.geklusd.data == True:
+                g = Groep.query.filter_by(name=form.naam).first()
+                if int(g.strepen)>2:
+                    g.strepen = str(int(g.strepen)-3)
+                else:
+                    g.strepen='0'
+                form.strepen = g.strepen
+                form.geklusd.data = False
+                db.session.commit()
+            else:
+                g = Groep.query.filter_by(name=form.naam).first()
+                g.strepen = str(int(g.strepen) + 1)
+                form.strepen = g.strepen
+                db.session.commit()
+    return render_template('strepen.html',title='groep strepen',forms=forms)
 
 @app.route('/afrekening',methods=['GET', 'POST'])
 @login_required
@@ -141,6 +185,7 @@ def afrekening():
                 l.rekening ='0'
                 form.rekening = l.rekening
                 form.bedrag.data = ''
+                form.betaald.data= False
                 db.session.commit()
             else:
                 l = Leider.query.filter_by(alias=form.alias).first()

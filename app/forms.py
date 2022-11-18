@@ -35,9 +35,10 @@ class MakeProgram(FlaskForm):
             raise ValidationError('Deze dag heeft al een programma')
 
 class StrepenForm(FlaskForm):
-    email = StringField("email")
-    strepen = StringField("strepen")
-    submit = SubmitField('submit')
+    naam = ''
+    strepen = ''
+    geklusd = BooleanField('3 strepen weg', default=False)
+    submit = SubmitField('Submit')
 
 class AfrekeningForm(FlaskForm):
     alias = ''

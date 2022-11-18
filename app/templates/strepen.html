@@ -2,20 +2,21 @@
 
 {% block content %}
 {% if current_user.status =='3'%}
-    {% for l in list %}
-            <p>{{l}}: <button id ='plus' onclick="plus()">+</button><input type="text" id="strepen" value={{l.strepen}}>
-                <button  id ='min' onclick="min()">-</button>
+    <form action="" method="post">
+        {% for form in forms %}
+            {{ form.hidden_tag() }}
+            <p>{{form.naam}}: {{form.strepen}}
+                {{ form.geklusd }} {{ form.geklusd.label }}
+                {{ form.submit() }}
             </p>
-            <script>
-                function  plus(){
-                document.getElementById("strepen").value ={{l.give_stripe()}};
-            }
-            </script>
-    {% endfor %}
+        {% endfor %}
+    </form>
 {% endif%}
+
+
 {% if current_user.status =='1' or current_user.status =='2'%}
-    {% for l in list %}
-        <p>{{l}}:{{l.strepen}} </p>
+    {% for form in forms %}
+        <p>{{form.naam}}:{{form.strepen}} </p>
     {% endfor%}
 {% endif%}
 {% endblock %}
