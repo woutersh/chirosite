@@ -1,15 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if current_user.status =='3'%}
     {% for l in list %}
             <p>{{l}}: <button id ='plus' onclick="plus()">+</button><input type="text" id="strepen" value={{l.strepen}}>
                 <button  id ='min' onclick="min()">-</button>
             </p>
             <script>
                 function  plus(){
-                document.getElementById("strepen").value ={{l.reduce_stripe()}};
+                document.getElementById("strepen").value ={{l.give_stripe()}};
             }
             </script>
     {% endfor %}
-
+{% endif%}
+{% if current_user.status =='1' or current_user.status =='2'%}
+    {% for l in list %}
+        <p>{{l}}:{{l.strepen}} </p>
+    {% endfor%}
+{% endif%}
 {% endblock %}

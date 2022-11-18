@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.status =='2'%}
+   {% for form in forms %}
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+        <tr>
+          <td >{{ form.alias }} bedrag: {{form.rekening}}</td>
+                {{ form.bedrag.label }}
+                {{ form.bedrag(size=4)}}
+                {% for error in form.bedrag.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                {{ form.betaald }} {{ form.betaald.label }}
+                {{ form.submit() }}
+        </tr>
+    </form>
+{% endfor %}
+{% endif%}
+
+{% if current_user.status =='3' or current_user.status =='1'%}
+   {% for form in forms %}
+    <form action="" method="post">
+      {{ form.hidden_tag() }}
+        <tr>
+          <td >{{ form.alias }} bedrag: {{form.rekening}}</td>
+
+        </tr>
+    </form>
+{% endfor %}
+{% endif%}
+
+
+{% endblock %}

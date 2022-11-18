@@ -52,6 +52,9 @@ class Leider(UserMixin,db.Model):
             return self.strepen
         else:return self.strepen
 
+    def get_strepen_int(self):
+        return int(self.strepen)
+
 
 
 

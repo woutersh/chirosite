@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for,request
 from app import app,db
-from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm
+from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm,AfrekeningForm
 from flask_login import current_user, login_user,logout_user, login_required
 from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
@@ -115,12 +115,38 @@ def edit_programma():
 def leiding_strepen():
     leiders =Leider.query.all()
     form = StrepenForm()
-
     return render_template('strepen.html',title='strepen',list=leiders,form=form)
 
-@app.route('/groep_strepen')
+@app.route('/groep_strepen',methods=['GET', 'POST'])
 @login_required
 def groep_strepen():
     form = StrepenForm()
     groepen =Groep.query.all()
     return render_template('strepen.html',title='strepen',list=groepen,form=form)
+
+@app.route('/afrekening',methods=['GET', 'POST'])
+@login_required
+def afrekening():
+    leiders = Leider.query.order_by(Leider.groep_id).all()
+    forms =[]
+    for leider in leiders:
+        form = AfrekeningForm(prefix=leider.alias)
+        form.alias = leider.alias
+        form.rekening=leider.rekening
+        forms.append(form)
+    for form in forms:
+        if form.submit.data and form.validate_on_submit():
+            if form.betaald.data==True:
+                l = Leider.query.filter_by(alias=form.alias).first()
+                l.rekening ='0'
+                form.rekening = l.rekening
+                form.bedrag.data = ''
+                db.session.commit()
+            else:
+                l = Leider.query.filter_by(alias=form.alias).first()
+                l.rekening=str(int(form.bedrag.data)+int(l.rekening))
+                form.rekening= l.rekening
+                form.bedrag.data=''
+                db.session.commit()
+    return render_template('afrekening.html', title='Afrekening', forms=forms,leiders=leiders)
+
