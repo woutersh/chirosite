@@ -22,7 +22,7 @@ class Leider(UserMixin,db.Model):
 
     def __repr__(self):
         if self.alias != None:
-            return '{}'.format(self.alias)
+            return self.alias
         else:
             return '{} {}'.format(self.firstname,self.lastname)
 
@@ -60,15 +60,16 @@ class Leider(UserMixin,db.Model):
 
 
 
+
 class Groep(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(45), index=True, unique=True)
+    naam = db.Column(db.String(45), index=True, unique=True)
     strepen = db.Column(db.String(2), index=True,default = '0')
     leider = db.relationship('Leider', backref='groep', lazy='dynamic')
     programma = db.relationship('Programma', backref='groep', lazy='dynamic')
 
     def __repr__(self):
-        return '{}'.format(self.name)
+        return self.naam
 
 
 class Programma(UserMixin, db.Model):

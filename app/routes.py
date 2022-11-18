@@ -12,9 +12,17 @@ from datetime import datetime
 @app.route('/index')
 @login_required
 def index():
-    leider = {'firstname': 'Hannes'}
-    groepen =Groep.query.all()
-    return render_template('index.html', title='Home', leider=leider,groepen=groepen)
+    leiders = Leider.query.all()
+    groepen = Groep.query.all()
+    prijzepot = []
+    trakteren = []
+    for leider in leiders:
+        if int(leider.strepen)>2:
+            prijzepot.append(leider)
+    for groep in groepen:
+        if int(groep.strepen)>2:
+            trakteren.append(groep)
+    return render_template('index.html', title='Home', prijzepot=prijzepot,groepen=groepen,trakteren=trakteren)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -146,14 +154,14 @@ def groep_strepen():
     groepen =Groep.query.all()
     forms=[]
     for groep in groepen:
-        form = StrepenForm(prefix=groep.name)
-        form.naam = groep.name
+        form = StrepenForm(prefix=groep.naam)
+        form.naam = groep.naam
         form.strepen = groep.strepen
         forms.append(form)
     for form in forms:
         if form.submit.data and form.validate_on_submit():
             if form.geklusd.data == True:
-                g = Groep.query.filter_by(name=form.naam).first()
+                g = Groep.query.filter_by(naam=form.naam).first()
                 if int(g.strepen)>2:
                     g.strepen = str(int(g.strepen)-3)
                 else:
@@ -162,7 +170,7 @@ def groep_strepen():
                 form.geklusd.data = False
                 db.session.commit()
             else:
-                g = Groep.query.filter_by(name=form.naam).first()
+                g = Groep.query.filter_by(naam=form.naam).first()
                 g.strepen = str(int(g.strepen) + 1)
                 form.strepen = g.strepen
                 db.session.commit()

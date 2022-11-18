@@ -2,6 +2,8 @@
 
 {% block content %}
     <h1>Leider: {{leider}}</h1>
+    <div><td>adres: {{leider.address}}</td></div>
+    <div><td>email: {{leider.email}}</td></div>
     <div></div><td>Groep: <a href="{{ url_for('groep', email=current_user.email, id=leider.groep_id) }}"> {{leider.groep}}</a></td></div>
     <div><td>Strepen: {{leider.strepen}}</td></div>
     <div><td>Rekening: {{leider.rekening}} euro</td></div>
