@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, url_for,request
 from app import app,db
-from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm,AfrekeningForm
+from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm,AfrekeningForm,editPogramForm
 from flask_login import current_user, login_user,logout_user, login_required
 from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
 from datetime import datetime
+
 
 
 
@@ -60,11 +61,11 @@ def groep(email,id):
     leider = Leider.query.filter_by(email=email).first_or_404()
     groep = Groep.query.filter_by(id=id).first_or_404()
     programmas = Programma.query.filter_by(groep_id=groep.id).all()
-    sorted = programmas.sort(key=lambda date: datetime.strptime(date.datum.strip(), "%d/%m/%y"))
+    programmas = sorted(programmas,key=Programma.sortDates)
+    form = MakeProgram()
     for p in programmas:
         if datetime.strptime(p.datum.strip(),'%d/%m/%y') < datetime.now():
             programmas.remove(p)
-    form = MakeProgram()
     if form.validate_on_submit():
         program = Programma(activiteit=form.activiteit.data, datum=form.datum.data,groep=groep)
         db.session.add(program)
@@ -72,10 +73,12 @@ def groep(email,id):
         if datetime.strptime(program.datum.strip(),'%d/%m/%y') > datetime.now():
             programmas.append(program)
             flash('programma is toegevoegd')
+    elif request.method =="GET":
 
-        return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas\
+
+        return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                ,leiders=leiders)
-    return render_template('groep.html',groep=groep,form =form,leider=leider,programmas=programmas\
+    return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                 ,leiders=leiders)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -88,7 +91,7 @@ def edit_profile():
         current_user.alias = form.alias.data
         current_user.address = form.address.data
         db.session.commit()
-        flash('Your changes have been saved.')
+        flash('Je profiel is aangepast')
         return render_template('leider.html', leider=current_user)
     elif request.method == 'GET':
         form.email.data = current_user.email
@@ -98,26 +101,6 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
-@app.route('/edit_programma', methods=['GET', 'POST'])
-@login_required
-def edit_programma():
-    form = EditProfileForm()
-    if form.validate_on_submit():
-        current_user.email = form.email.data
-        current_user.afwezigheid = form.afwezigheid.data
-        current_user.alias = form.alias.data
-        current_user.address = form.address.data
-        current_user.set_password(form.password.data)
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return render_template('leider.html', leider=current_user)
-    elif request.method == 'GET':
-        form.email.data = current_user.email
-        form.afwezigheid.data = current_user.afwezigheid
-        form.address.data = current_user.address
-        form.alias.data = current_user.alias
-    return render_template('edit_profile.html', title='Edit Profile',
-                           form=form)
 @app.route('/leiding_strepen', methods=['GET', 'POST'] )
 @login_required
 def leiding_strepen():
@@ -154,14 +137,14 @@ def groep_strepen():
     groepen =Groep.query.all()
     forms=[]
     for groep in groepen:
-        form = StrepenForm(prefix=groep.naam)
-        form.naam = groep.naam
+        form = StrepenForm(prefix=groep.name)
+        form.naam = groep.name
         form.strepen = groep.strepen
         forms.append(form)
     for form in forms:
         if form.submit.data and form.validate_on_submit():
             if form.geklusd.data == True:
-                g = Groep.query.filter_by(naam=form.naam).first()
+                g = Groep.query.filter_by(name=form.naam).first()
                 if int(g.strepen)>2:
                     g.strepen = str(int(g.strepen)-3)
                 else:
@@ -170,7 +153,7 @@ def groep_strepen():
                 form.geklusd.data = False
                 db.session.commit()
             else:
-                g = Groep.query.filter_by(naam=form.naam).first()
+                g = Groep.query.filter_by(name=form.naam).first()
                 g.strepen = str(int(g.strepen) + 1)
                 form.strepen = g.strepen
                 db.session.commit()
@@ -202,4 +185,27 @@ def afrekening():
                 form.bedrag.data=''
                 db.session.commit()
     return render_template('afrekening.html', title='Afrekening', forms=forms,leiders=leiders)
+
+@app.route('/edit_programma/<pid>',methods=['GET', 'POST'])
+@login_required
+def edit_programma(pid):
+    programma = Programma.query.filter_by(id=pid).first_or_404()
+    groep =Groep.query.filter_by(id=programma.groep_id).first_or_404()
+    form = editPogramForm()
+    if form.validate_on_submit():
+        programma.activiteit= form.activiteit.data
+        programma.time_posted = datetime.now()
+        db.session.commit()
+        flash('Het programma is aangepast')
+        return render_template('edit_programma.html', title='Programma', programma=programma, form=form)
+    elif request.method =='GET':
+        form.datum= programma.datum
+        form.activiteit.data=programma.activiteit
+    return render_template('edit_programma.html',title='Programma',programma=programma,form=form)
+
+
+
+
+
+
 

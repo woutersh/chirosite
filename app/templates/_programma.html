@@ -3,6 +3,7 @@
     <tr valign="top">
         <td>datum: {{program.datum}}<br>
         laatst bijgewerkt op: {{program.time_posted}}<br>
-        programma: {{program.activiteit}}</td>
+        programma: {{program.activiteit}}<br>
+        <a href="{{ url_for('edit_programma',pid=program.id) }}">programma aanpassen</a></td>
     </tr>
 </table>

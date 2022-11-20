@@ -4,35 +4,15 @@
     <h1>Programma maken</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
+            {{ form.datum}}
         <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
-            {% for error in form.email.errors %}
+            {{ form.activiteit.label }}<br>
+            {{ form.activiteit(cols=32, rows=4) }}<br>
+            {% for error in form.activiteit.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>
-            {{ form.afwezigheid.label }}<br>
-            {{ form.afwezigheid(cols=50, rows=4) }}<br>
-            {% for error in form.afwezigheid.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.address.label }}<br>
-            {{ form.address(size=32) }}<br>
-            {% for error in form.address.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.alias.label }}<br>
-            {{ form.alias(size=32) }}<br>
-            {% for error in form.alias.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-
+        <a href="{{ url_for('groep', email=current_user.email, id=programma.groep_id) }}">terug naar groep</a>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

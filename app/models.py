@@ -63,24 +63,34 @@ class Leider(UserMixin,db.Model):
 
 class Groep(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    naam = db.Column(db.String(45), index=True, unique=True)
+    name = db.Column(db.String(45), index=True, unique=True)
     strepen = db.Column(db.String(2), index=True,default = '0')
     leider = db.relationship('Leider', backref='groep', lazy='dynamic')
     programma = db.relationship('Programma', backref='groep', lazy='dynamic')
 
     def __repr__(self):
-        return self.naam
+        return self.name
+
+    def programmas(self):
+        return Programma.query.filter_by(groep_id= self.id).all()
+
+
 
 
 class Programma(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     activiteit = db.Column(db.String(500), index=True)
     datum = db.Column(db.String(45), index=True)
-    time_posted = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    time_posted = db.Column(db.DateTime, index=True, default=datetime.now)
     groep_id = db.Column(db.Integer, db.ForeignKey('groep.id'))
 
     def __repr__(self):
         return 'Programma van {}'.format(self.datum)
+
+    def sortDates(self):
+        split=self.datum.split('/')
+        return split[2],split[1],split[0]
+
 
 
 @login.user_loader

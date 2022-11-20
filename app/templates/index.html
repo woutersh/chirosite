@@ -4,12 +4,12 @@
     <h1>Hi, {{ current_user.firstname }}!</h1>
     groepen:
     {% for g in groepen %}
-        <a href="{{ url_for('groep', email=current_user.email, id=g.id) }}">{{g.naam}}</a>
+        <a href="{{ url_for('groep', email=current_user.email, id=g.id) }}">{{g.name}}</a>
     {% endfor %}
         <p></p>
         <p><a href="{{ url_for('leiding_strepen') }}">{{'Leidingstrepen'}}</a></p>
         <p><a href="{{ url_for('groep_strepen') }}">{{'Groepstrepen'}}</a></p>
         <p><a href="{{ url_for('afrekening') }}">{{'Afrekening'}}</a></p>
-        deze lijders hebben een klusje: <p>{{prijzepot.naam}} {{prijzepot.strepen}}</p>
-        deze groepen moeten een bak kopen : <p>{{trakteren.naam}} {{trakteren.strepen}}</p>
+        deze lijders hebben een klusje: <p>{{prijzepot}}</p>
+        deze groepen moeten een bak kopen : <p>{{trakteren}}</p>
 {% endblock %}

@@ -25,7 +25,7 @@ class EditProfileForm(FlaskForm):
 
 
 class MakeProgram(FlaskForm):
-    datum = TextAreaField('Datum (dd/mm/jj)',validators=[DataRequired()])
+    datum = StringField('Datum (dd/mm/jj)',validators=[DataRequired()])
     activiteit = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
     submit = SubmitField('Submit')
 
@@ -46,3 +46,8 @@ class AfrekeningForm(FlaskForm):
     bedrag = StringField("Bedrag toevoegen:")
     submit = SubmitField('Submit')
     betaald = BooleanField('Betaald',default=False)
+
+class editPogramForm(FlaskForm):
+    datum =''
+    activiteit = TextAreaField('Programma:', validators=[Length(min=0, max=500)])
+    submit = SubmitField('Save')
