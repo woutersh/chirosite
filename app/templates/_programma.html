@@ -4,6 +4,8 @@
         <td>datum: {{program.datum}}<br>
         laatst bijgewerkt op: {{program.time_posted}}<br>
         programma: {{program.activiteit}}<br>
+            {% if current_user.groep_id == groep.id %}
         <a href="{{ url_for('edit_programma',pid=program.id) }}">programma aanpassen</a></td>
+        {% endif %}
     </tr>
 </table>

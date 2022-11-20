@@ -1,5 +1,7 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
+Leiders =['Kroeme','Danny','JVA','Sammy','Danny sjot','Strits']
+Groepen ={'Sloebers':1,'Speelclub':2,'Rakkers':3,'Topper':4,'Kerels':5,'Aspiranten':6}
 
 
 class Config(object):

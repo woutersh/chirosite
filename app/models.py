@@ -1,3 +1,4 @@
+from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -77,6 +78,8 @@ class Groep(UserMixin, db.Model):
 
 
 
+
+
 class Programma(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     activiteit = db.Column(db.String(500), index=True)
@@ -87,9 +90,13 @@ class Programma(UserMixin, db.Model):
     def __repr__(self):
         return 'Programma van {}'.format(self.datum)
 
+
     def sortDates(self):
         split=self.datum.split('/')
         return split[2],split[1],split[0]
+
+
+
 
 
 

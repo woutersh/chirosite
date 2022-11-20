@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, url_for,request
 from app import app,db
-from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm,AfrekeningForm,editPogramForm
+from app.forms import LoginForm,MakeProgram,EditProfileForm,StrepenForm,AfrekeningForm,editPogramForm,RegistrationForm
 from flask_login import current_user, login_user,logout_user, login_required
 from app.models import Leider,Groep,Programma
 from werkzeug.urls import url_parse
 from datetime import datetime
+from config import Groepen
 
 
 
@@ -24,6 +25,7 @@ def index():
         if int(groep.strepen)>2:
             trakteren.append(groep)
     return render_template('index.html', title='Home', prijzepot=prijzepot,groepen=groepen,trakteren=trakteren)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -46,6 +48,19 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        leider = Leider(firstname=form.firstname.data,lastname=form.lastname.data,alias=form.alias.data,address=form.address.data, email=form.email.data)
+        leider.set_password(form.password.data)
+        leider.groep_id =Groepen[form.groep_id.data]
+        db.session.add(leider)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Registratie', form=form)
 
 @app.route('/user/<email>/<id>')
 @login_required
@@ -67,16 +82,18 @@ def groep(email,id):
         if datetime.strptime(p.datum.strip(),'%d/%m/%y') < datetime.now():
             programmas.remove(p)
     if form.validate_on_submit():
-        program = Programma(activiteit=form.activiteit.data, datum=form.datum.data,groep=groep)
+        program = Programma(activiteit=form.activiteit.data,groep=groep,datum=form.datum.data)
+        for p in programmas:
+            if p.datum == program.datum:
+                flash('die dag had je al iets gepland')
+                return render_template('groep.html', title='groep', groep=groep, form=form, leider=leider,
+                                       programmas=programmas[0:2], leiders=leiders)
         db.session.add(program)
         db.session.commit()
         if datetime.strptime(program.datum.strip(),'%d/%m/%y') > datetime.now():
             programmas.append(program)
             flash('programma is toegevoegd')
-    elif request.method =="GET":
-
-
-        return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
+            return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                ,leiders=leiders)
     return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                 ,leiders=leiders)
@@ -88,7 +105,6 @@ def edit_profile():
     if form.validate_on_submit():
         current_user.email = form.email.data
         current_user.afwezigheid = form.afwezigheid.data
-        current_user.alias = form.alias.data
         current_user.address = form.address.data
         db.session.commit()
         flash('Je profiel is aangepast')
@@ -97,7 +113,6 @@ def edit_profile():
         form.email.data = current_user.email
         form.afwezigheid.data = current_user.afwezigheid
         form.address.data = current_user.address
-        form.alias.data = current_user.alias
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
@@ -180,7 +195,7 @@ def afrekening():
                 db.session.commit()
             else:
                 l = Leider.query.filter_by(alias=form.alias).first()
-                l.rekening=str(int(form.bedrag.data)+int(l.rekening))
+                l.rekening=str(float(form.bedrag.data)+float(l.rekening))
                 form.rekening= l.rekening
                 form.bedrag.data=''
                 db.session.commit()
