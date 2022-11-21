@@ -95,6 +95,11 @@ def groep(email,id):
             flash('programma is toegevoegd')
             return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                ,leiders=leiders)
+    elif request.method =='GET':
+        for p in programmas:
+            if datetime.strptime(p.datum.strip(), '%d/%m/%y') < datetime.now():
+                programmas.remove(p)
+
     return render_template('groep.html',title='groep',groep=groep,form =form,leider=leider,programmas=programmas[0:2]\
                                 ,leiders=leiders)
 

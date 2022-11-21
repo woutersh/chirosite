@@ -54,13 +54,6 @@ class Leider(UserMixin,db.Model):
             return self.strepen
 
 
-    def get_strepen_int(self):
-        '''returned strepen als in intiger'''
-        return int(self.strepen)
-
-
-
-
 
 
 
@@ -110,14 +103,10 @@ class Programma(UserMixin, db.Model):
     def __repr__(self):
         return 'Programma van {}'.format(self.datum)
 
-
     def sortDates(self):
         '''splits de datums en zet ze op volgorde zodat ze als string gesorteerd kunnen worden'''
         split=self.datum.split('/')
         return split[2],split[1],split[0]
-
-
-
 
 
 
