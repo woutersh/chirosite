@@ -130,20 +130,11 @@ def leiding_strepen():
         if form.submit.data and form.validate_on_submit():
             if form.geklusd.data == True:
                 l = Leider.query.filter_by(alias=form.naam).first()
-                if int(l.strepen) > 2:
-                    l.strepen = str(int(l.strepen) - 3)
-                else:
-                    l.strepen = '0'
-                form.strepen = l.strepen
+                form.strepen = l.reduce_stripe()
                 form.geklusd.data = False
-                db.session.commit()
-
-
             else:
                 l = Leider.query.filter_by(alias=form.naam).first()
-                l.strepen = str(int(l.strepen) + 1)
-                form.strepen = l.strepen
-                db.session.commit()
+                form.strepen = l.give_stripe()
     return render_template('strepen.html', title='leider strepen', forms=forms)
 
 @app.route('/groep_strepen',methods=['GET', 'POST'])
@@ -160,18 +151,12 @@ def groep_strepen():
         if form.submit.data and form.validate_on_submit():
             if form.geklusd.data == True:
                 g = Groep.query.filter_by(name=form.naam).first()
-                if int(g.strepen)>2:
-                    g.strepen = str(int(g.strepen)-3)
-                else:
-                    g.strepen='0'
-                form.strepen = g.strepen
+                form.strepen = g.reduce_stripe()
                 form.geklusd.data = False
-                db.session.commit()
             else:
                 g = Groep.query.filter_by(name=form.naam).first()
-                g.strepen = str(int(g.strepen) + 1)
-                form.strepen = g.strepen
-                db.session.commit()
+
+                form.strepen = g.give_stripe()
     return render_template('strepen.html',title='groep strepen',forms=forms)
 
 @app.route('/afrekening',methods=['GET', 'POST'])

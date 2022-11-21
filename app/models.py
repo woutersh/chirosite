@@ -28,32 +28,34 @@ class Leider(UserMixin,db.Model):
             return '{} {}'.format(self.firstname,self.lastname)
 
     def set_password(self, password):
+        '''genereerd een password beveiliging en stilt dit ineens in'''
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+        '''check via beveiliging of het password juist is'''
         return check_password_hash(self.password_hash, password)
 
 
-    def get_leider(id):
-        leider = Leider.query.get(id)
-        if leider:
-            return leider
-        else:
-            raise ValueError('geen leider gevonden met dit id')
-
     def give_stripe(self):
+        '''voegt een streep bij de persoon toe'''
         self.strepen =str(int(self.strepen)+1)
         db.session.commit()
         return self.strepen
 
     def reduce_stripe(self):
-        if int(self.strepen)>0:
-            self.strepen = str(int(self.strepen) - 1)
+        '''checkt of de persoon wel een streep heeft en trekt er dan 1 af'''
+        if int(self.strepen)>2:
+            self.strepen = str(int(self.strepen) - 3)
             db.session.commit()
             return self.strepen
-        else:return self.strepen
+        else:
+            self.strepen ='0'
+            db.session.commit()
+            return self.strepen
+
 
     def get_strepen_int(self):
+        '''returned strepen als in intiger'''
         return int(self.strepen)
 
 
@@ -73,7 +75,25 @@ class Groep(UserMixin, db.Model):
         return self.name
 
     def programmas(self):
+        '''returned een lijst van programmas van de groep'''
         return Programma.query.filter_by(groep_id= self.id).all()
+
+    def give_stripe(self):
+        '''voegt een streep bij de persoon toe'''
+        self.strepen =str(int(self.strepen)+1)
+        db.session.commit()
+        return self.strepen
+
+    def reduce_stripe(self):
+        '''checkt of de persoon wel een streep heeft en trekt er dan 1 af'''
+        if int(self.strepen)>2:
+            self.strepen = str(int(self.strepen) - 3)
+            db.session.commit()
+            return self.strepen
+        else:
+            self.strepen ='0'
+            db.session.commit()
+            return self.strepen
 
 
 
@@ -92,6 +112,7 @@ class Programma(UserMixin, db.Model):
 
 
     def sortDates(self):
+        '''splits de datums en zet ze op volgorde zodat ze als string gesorteerd kunnen worden'''
         split=self.datum.split('/')
         return split[2],split[1],split[0]
 

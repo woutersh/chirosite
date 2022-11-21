@@ -7,6 +7,23 @@ from datetime import datetime
 from config import Leiders,Groepen
 
 
+def validate_email(form, email):
+    '''
+    dit wordt gebruikt in registration en edit_profile
+
+    kijkt eerst of het email adres al in de db staat
+    daarna doe ik een zeer kleine check of het effectief wel om een email gaat
+    '''
+    leider = Leider.query.filter_by(email=email.data).first()
+    if leider is not None:
+        raise ValidationError('dit email adres is al in gebruik')
+    email = email.data.strip()
+    ongeldig = True
+    for char in email:
+        if char == '@':
+            ongeldig = False
+    if ongeldig:
+        raise ValidationError('dit is geen geldig email adres')
 
 
 class LoginForm(FlaskForm):
@@ -16,22 +33,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 class EditProfileForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(),Email(),Length(max=80)])
+    email = StringField('Email', validators=[DataRequired(),Email(),Length(max=80),validate_email])
     afwezigheid = TextAreaField('Aanwezigheid', validators=[Length(min=0, max=100)])
     address = StringField('Adres',validators=[DataRequired(),Length(max=120)])
     submit = SubmitField('Submit')
 
-    def validate_email(self, email):
-        leider = Leider.query.filter_by(email=email.data).first()
-        if leider is not None:
-            raise ValidationError('dit email adres is al in gebruik')
-        email = email.data.strip()
-        ongeldig = True
-        for char in email:
-            if char == '@':
-                ongeldig = False
-        if ongeldig:
-            raise ValidationError('dit is geen geldig email adres')
 
 
 
@@ -42,6 +48,7 @@ class MakeProgram(FlaskForm):
     submit = SubmitField('Submit')
 
     def validate_datum(self,datum):
+        '''check of de datum op de juiste manier wordt ingegeven'''
         try:
             datetime.strptime(datum.data,'%d/%m/%y')
         except:
@@ -50,7 +57,7 @@ class MakeProgram(FlaskForm):
 class RegistrationForm(FlaskForm):
     firstname = StringField('Voornaam', validators=[DataRequired(),Length(min=1,max=45)])
     lastname = StringField('Achternaam', validators=[DataRequired(),Length(min=1,max=45)])
-    email = StringField('Email', validators=[DataRequired(), Email(),Length(max=80)])
+    email = StringField('Email', validators=[DataRequired(), Email(),Length(max=80),validate_email])
     address = StringField('Adres',validators=[DataRequired(),Length(max=120)])
     alias = StringField('Bijnaam', validators=[DataRequired(), Length(min=1, max=45),AnyOf(values=Leiders)])
     groep_id =StringField('Groep',validators=[DataRequired(),AnyOf(values=Groepen.keys())])
@@ -60,21 +67,12 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_alias(self, alias):
+        '''check of de leider al niet in de db staat'''
         leider = Leider.query.filter_by(alias=alias.data).first()
         if leider is not None:
             raise ValidationError('dit profiel heeft al een account')
 
-    def validate_email(self, email):
-        leider = Leider.query.filter_by(email=email.data).first()
-        if leider is not None:
-            raise ValidationError('dit email adres is al in gebruik')
-        email = email.data.strip()
-        ongeldig = True
-        for char in email:
-            if char == '@':
-                ongeldig = False
-        if ongeldig:
-            raise ValidationError('dit is geen geldig email adres')
+
 
 
 
@@ -93,6 +91,7 @@ class AfrekeningForm(FlaskForm):
     betaald = BooleanField('Betaald',default=False)
 
     def validate_bedrag(self,bedrag):
+        '''check of het bedrag effectief een float is'''
         if bedrag.data == '' :
             bedrag.data ='0'
         try:
