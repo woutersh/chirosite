@@ -278,16 +278,6 @@ class ProgrammaTest(unittest.TestCase):
         self.assertEqual(C_DATE2,pr.datum)
         self.assertEqual(('22', '11', '7'),pr.sortDates())
 
-class LeiderTest(unittest.TestCase):
-    def setUp(self):
-        self.app_context = app.app_context()
-        self.app_context.push()
-        db.create_all()
-
-    def tearDown(self):
-            db.session.remove()
-            db.drop_all()
-            self.app_context.pop()
 
 
 
